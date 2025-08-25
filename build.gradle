@@ -1,0 +1,54 @@
+plugins {
+	id 'org.springframework.boot' version '3.3.2'
+	id 'io.spring.dependency-management' version '1.1.5'
+	id 'java'
+}
+
+java { toolchain { languageVersion = JavaLanguageVersion.of(17) } }
+
+repositories { mavenCentral() }
+
+ext {
+	// Boot 3.3.x는 Cloud 2023.0.x 사용
+	set('springCloudVersion', "2023.0.5") // 최신 SR로 맞추기
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-websocket'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
+	// MongoDB
+	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
+
+	// (선택) Redis: presence/캐시/세션에 활용
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+	// Eureka & Feign (다른 서비스 호출/디스커버리)
+	implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+	implementation 'org.springframework.cloud:spring-cloud-starter-loadbalancer' // @LoadBalanced RestTemplate/Feign에 필요
+
+	// (선택) Kafka 쓰면
+	implementation 'org.springframework.kafka:spring-kafka'
+
+	// JWT 파싱(간단 HMAC 버전)
+	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+	runtimeOnly  'io.jsonwebtoken:jjwt-impl:0.11.5'
+	runtimeOnly  'io.jsonwebtoken:jjwt-jackson:0.11.5'
+
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+dependencyManagement {
+	imports {
+		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+	}
+}
+
+tasks.test { useJUnitPlatform() }
